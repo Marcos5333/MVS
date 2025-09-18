@@ -1,0 +1,98 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+ body {
+    margin:0;
+    padding:0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg,#0d47a1,#43a047);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    color:#333;
+  }
+
+/* Container central */
+.container {
+  background-color: white;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  width: 350px;
+  text-align: center;
+}
+
+/* Títulos */
+h1 {
+  font-size: 1.8em;
+  margin-bottom: 25px;
+  color: #2f3640;
+}
+
+h2 {
+  font-size: 1.4em;
+  margin-bottom: 20px;
+  color: #2f3640;
+}
+
+/* Inputs */
+input {
+  width: 100%;
+  padding: 12px 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+  transition: border 0.3s;
+}
+
+input:focus {
+  outline: none;
+  border-color: #40739e;
+}
+
+/* Botões */
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  background-color: #40739e;
+  color: white;
+  font-weight: bold;
+  font-size: 1em;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: #2f3640;
+}
+
+/* Links */
+a {
+  color: #40739e;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Mensagens de erro */
+.error {
+  color: red;
+  font-size: 0.9em;
+  margin-top: 5px;
+}
+
+/* Formulários */
+#register-form {
+  display: none;
+}
