@@ -1,4 +1,4 @@
-// auth.js (corrigido)
+// auth.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getAuth,
@@ -7,6 +7,7 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+// ------------------ Config Firebase ------------------
 const firebaseConfig = {
   apiKey: "AIzaSyCinr-cHlnww6oqPKI2Mv-tmii84uxkJJI",
   authDomain: "mvsz-4007f.firebaseapp.com",
@@ -19,60 +20,85 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// utilitário: pega nome do arquivo atual (ex: index.html, painel.html)
+// ------------------ Páginas de login/registro ------------------
 function currentPage() {
   const p = window.location.pathname.split("/").pop();
   return p === "" ? "index.html" : p;
 }
-
-// páginas de login/registro (ajuste se seus nomes forem diferentes)
 const LOGIN_PAGES = ["index.html", "login.html", "register.html"];
 
-// Debug: mostra evento auth no console
+// ------------------ onAuthStateChanged ------------------
 onAuthStateChanged(auth, (user) => {
   const page = currentPage();
   console.log("[AUTH] onAuthStateChanged", { user: !!user, page });
 
   if (user) {
-    // se está logado e estiver numa página de login/registro, envia pro painel
+    // Redireciona para painel se estiver logado
     if (LOGIN_PAGES.includes(page)) {
-      // use replace para não enfileirar histórico (evita voltar para login com "Voltar")
       window.location.replace("painel.html");
     }
-    // se já estiver no painel, não faz nada (permite continuidade)
   } else {
-    // se não está logado e está em uma página protegida (ex: painel.html), manda pro login
+    // Redireciona para login se tentar acessar painel
     if (!LOGIN_PAGES.includes(page)) {
       window.location.replace("index.html");
     }
   }
 });
 
-// Registro (chame window.register() do formulário)
+// ------------------ Alternar formulários ------------------
+window.showRegister = () => {
+  document.getElementById("login-form").style.display = "none";
+  document.getElementById("register-form").style.display = "block";
+  clearErrors();
+};
+
+window.showLogin = () => {
+  document.getElementById("register-form").style.display = "none";
+  document.getElementById("login-form").style.display = "block";
+  clearErrors();
+};
+
+// Limpa mensagens de erro
+function clearErrors() {
+  const errors = document.querySelectorAll(".error");
+  errors.forEach(e => e.textContent = "");
+}
+
+// ------------------ Registro ------------------
 window.register = async () => {
-  const name = document.getElementById("register-name")?.value;
-  const email = document.getElementById("register-email")?.value;
-  const password = document.getElementById("register-password")?.value;
+  const name = document.getElementById("register-name")?.value.trim();
+  const email = document.getElementById("register-email")?.value.trim();
+  const password = document.getElementById("register-password")?.value.trim();
   const errorMsg = document.getElementById("register-error");
+
+  if (!name || !email || !password) {
+    errorMsg.textContent = "Preencha todos os campos!";
+    return;
+  }
+
   try {
     await createUserWithEmailAndPassword(auth, email, password);
-    // redirect será tratado pelo onAuthStateChanged, mas usamos replace por segurança
-    window.location.replace("painel.html");
+    window.location.replace("painel.html"); // redirect será tratado pelo onAuthStateChanged
   } catch (err) {
     if (errorMsg) errorMsg.textContent = err.message;
     console.error("[AUTH] register error:", err);
   }
 };
 
-// Login (chame window.login() do formulário)
+// ------------------ Login ------------------
 window.login = async () => {
-  const email = document.getElementById("login-email")?.value;
-  const password = document.getElementById("login-password")?.value;
+  const email = document.getElementById("login-email")?.value.trim();
+  const password = document.getElementById("login-password")?.value.trim();
   const errorMsg = document.getElementById("login-error");
+
+  if (!email || !password) {
+    errorMsg.textContent = "Preencha todos os campos!";
+    return;
+  }
+
   try {
     await signInWithEmailAndPassword(auth, email, password);
-    // redirect será tratado pelo onAuthStateChanged; garantir replace
-    window.location.replace("painel.html");
+    window.location.replace("painel.html"); // redirect será tratado pelo onAuthStateChanged
   } catch (err) {
     if (errorMsg) errorMsg.textContent = err.message;
     console.error("[AUTH] login error:", err);
