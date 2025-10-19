@@ -420,6 +420,8 @@ body.dark-mode #busca-evento {
 }
 
 /* ================= Responsividade ================= */
+
+/* Tablets */
 @media (max-width: 768px) {
   .cards {
     flex-direction: column;
@@ -439,3 +441,61 @@ body.dark-mode #busca-evento {
   }
 }
 
+/* Celulares */
+@media (max-width: 480px) {
+  body {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
+  }
+  .sidebar h2 {
+    font-size: 1.2em;
+  }
+  .sidebar ul {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    overflow-x: auto;
+  }
+  .sidebar ul li {
+    margin-bottom: 0;
+  }
+  .sidebar ul li a {
+    padding: 8px 10px;
+    font-size: 0.85em;
+  }
+  .main-content {
+    padding: 10px;
+  }
+  .cards {
+    flex-direction: column;
+  }
+  table {
+    font-size: 0.85em;
+  }
+  .modal-content {
+    width: 95%;
+    padding: 15px;
+  }
+  .modal-content input,
+  .modal-content select,
+  .modal-content button {
+    width: 100%;
+    margin-top: 10px;
+  }
+  .agenda-container input,
+  .agenda-container #lista-eventos {
+    width: 100%;
+  }
+  .compromissos-hoje li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .compromissos-hoje li span {
+    margin-top: 5px;
+  }
+}
