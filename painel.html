@@ -40,31 +40,43 @@
             <p id="total-projetos">0</p>
           </div>
         </div>
+        <!-- Compromissos de Hoje -->
+<div class="card compromissos-hoje">
+  <h3>Compromissos de Hoje</h3>
+  <ul id="lista-hoje">
+    <li>Carregando compromissos...</li>
+  </ul>
+</div>
+
       </section>
 
       <!-- Agenda -->
-   <section id="agenda">
-  <h2>Próximos Eventos</h2>
+   <!-- AGENDA MODERNA -->
+<section id="agenda" style="display:none;">
+  <div class="section-header">
+    <h1>Agenda</h1>
+    <button id="open-agenda-modal">+ Novo Evento</button>
+  </div>
 
-  <table id="tabela-eventos">
-    <thead>
-      <tr>
-        <th>Data / Hora</th>
-        <th>Título</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody id="proximos-eventos">
-      <!-- Eventos serão adicionados aqui pelo JS -->
-    </tbody>
-  </table>
-
-  <h3>Adicionar Evento</h3>
-  <input type="text" id="evento-titulo" placeholder="Título">
-  <input type="date" id="evento-data">
-  <input type="time" id="evento-hora">
-  <button id="adicionar-evento">Adicionar</button>
+  <div class="agenda-container">
+    <input type="text" id="busca-evento" placeholder="🔍 Buscar evento..." />
+    <div id="lista-eventos" class="agenda-lista">
+      <!-- Eventos serão carregados aqui -->
+    </div>
+  </div>
 </section>
+
+<!-- MODAL DE EVENTO -->
+<div id="modal-agenda" class="modal">
+  <div class="modal-content">
+    <span class="close" id="close-agenda-modal">&times;</span>
+    <h2>Novo Evento</h2>
+    <input type="text" id="evento-titulo" placeholder="Título do evento">
+    <input type="date" id="evento-data">
+    <input type="time" id="evento-hora">
+    <button id="salvar-evento">Salvar Evento</button>
+  </div>
+</div>
 
 
 
@@ -137,5 +149,19 @@
 
   <!-- IMPORTANDO O JS COMO MODULE PARA FUNCIONAR COM FIREBASE -->
   <script type="module" src="painel.js"></script>
+
+  <!-- Modal de Confirmação -->
+<div id="modal-confirm" class="modal">
+  <div class="modal-content">
+    <span class="close" id="close-confirm">&times;</span>
+    <h2>Confirmação</h2>
+    <p id="confirm-text">Deseja realmente excluir este item?</p>
+    <div style="display:flex; justify-content: space-between; gap:10px; margin-top:20px;">
+      <button id="confirm-yes" class="primary">Sim</button>
+      <button id="confirm-no" class="btn-excluir">Não</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

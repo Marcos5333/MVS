@@ -169,67 +169,66 @@ table tbody tr:hover {
   background-color: #dcdde1;
 }
 
-section {
-  overflow-x: auto;
-}
-
-/* Buttons inside table */
-table button {
-  font-size: 0.85em;
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.3s;
-}
-
-/* Edit buttons */
-button.btn-editar {
-  background-color: #ff9f43;
-  color: #fff;
-}
-
-button.btn-editar:hover {
-  background-color: #e67e22;
-}
-
-/* Delete buttons */
-button.btn-excluir {
-  background-color: #ee5253;
-  color: #fff;
-}
-
-button.btn-excluir:hover {
-  background-color: #c0392b;
-}
-
-/* ================= Buttons ================= */
+/* ================= Button Base ================= */
 button {
-  padding: 8px 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 0.9rem;
   cursor: pointer;
-  font-weight: 600;
   transition: 0.3s;
+  line-height: 1;
+  text-align: center;
+  min-width: 100px;
 }
 
+/* ================= Button Variants ================= */
+button.primary,
 button#open-cliente-modal,
 button#open-projeto-modal,
 button#salvar-cliente-btn,
-button#salvar-projeto-btn {
+button#salvar-projeto-btn,
+#open-agenda-modal,
+#modal-agenda .modal-content button {
   background-color: #40739e;
   color: #fff;
 }
 
+button.primary:hover,
 button#open-cliente-modal:hover,
 button#open-projeto-modal:hover,
 button#salvar-cliente-btn:hover,
-button#salvar-projeto-btn:hover {
+button#salvar-projeto-btn:hover,
+#open-agenda-modal:hover,
+#modal-agenda .modal-content button:hover {
   background-color: #2f3640;
 }
 
-/* ================= Modal ================= */
+.btn-editar {
+  background-color: #ff9f43;
+  color: #fff;
+}
+
+.btn-editar:hover {
+  background-color: #e67e22;
+}
+
+.btn-excluir,
+.btn-excluir-evento {
+  background-color: #ee5253;
+  color: #fff;
+}
+
+.btn-excluir:hover,
+.btn-excluir-evento:hover {
+  background-color: #c0392b;
+}
+
+/* ================= Modals ================= */
 .modal {
   display: none;
   position: fixed;
@@ -239,7 +238,6 @@ button#salvar-projeto-btn:hover {
   width: 100%;
   height: 100%;
   background-color: rgba(0,0,0,0.5);
-  display: flex;
   justify-content: center;
   align-items: center;
 }
@@ -256,7 +254,6 @@ button#salvar-projeto-btn:hover {
 
 .modal-content h2 {
   margin-bottom: 20px;
-  color: #2f3640;
   text-align: center;
 }
 
@@ -269,38 +266,110 @@ button#salvar-projeto-btn:hover {
   border: 1px solid #ccc;
 }
 
-.modal-content select:focus,
-.modal-content input:focus {
+.modal-content input:focus,
+.modal-content select:focus {
   border-color: #40739e;
   outline: none;
   box-shadow: 0 0 5px rgba(64,115,158,0.5);
 }
 
-.modal-content button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 15px;
-  background-color: #40739e;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.modal-content button:hover {
-  background-color: #2f3640;
-}
-
-/* Close button */
 .close {
   position: absolute;
   top: 15px;
   right: 20px;
-  color: #333;
   font-size: 24px;
   font-weight: bold;
   cursor: pointer;
+}
+
+/* ================= Sections / Add Buttons ================= */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.section-header h1 {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.section-header button {
+  min-width: auto;
+  padding: 10px 18px;
+}
+
+/* ================= Agenda ================= */
+.agenda-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+#busca-evento {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 100%;
+  max-width: 400px;
+}
+
+.agenda-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.evento-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  gap: 12px;
+}
+
+.evento-card .evento-info {
+  flex: 1 1 auto;
+}
+
+.evento-card .btn-excluir-evento {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+}
+
+/* ================= Dashboard - Compromissos Hoje ================= */
+.compromissos-hoje {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 20px;
+  margin-top: 10px;
+}
+
+.compromissos-hoje ul {
+  list-style: none;
+}
+
+.compromissos-hoje li {
+  background: #f5f6fa;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-left: 4px solid #40739e;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.compromissos-hoje li span {
+  color: #555;
+  font-size: 0.85rem;
 }
 
 /* ================= Dark Mode ================= */
@@ -317,12 +386,11 @@ body.dark-mode .main-content {
   background-color: #1e1e2f;
 }
 
-body.dark-mode .card {
-  background-color: #2a2a3d;
-  color: #f5f5f5;
-}
-
-body.dark-mode table {
+body.dark-mode .card,
+body.dark-mode table,
+body.dark-mode .modal-content,
+body.dark-mode .evento-card,
+body.dark-mode .compromissos-hoje {
   background-color: #2a2a3d;
   color: #f5f5f5;
 }
@@ -335,10 +403,20 @@ body.dark-mode table tbody tr:hover {
   background-color: #33334d;
 }
 
-body.dark-mode .modal-content {
-  background-color: #2a2a3d;
-  color: #f5f5f5;
-  border: 1px solid #444;
+body.dark-mode .evento-info p,
+body.dark-mode .compromissos-hoje li span {
+  color: #ccc;
+}
+
+body.dark-mode .compromissos-hoje li {
+  background: #1e1e2f;
+  border-left-color: #05c46b;
+}
+
+body.dark-mode #busca-evento {
+  background: #1e1e2f;
+  color: #fff;
+  border: 1px solid #555;
 }
 
 /* ================= Responsividade ================= */
@@ -361,89 +439,3 @@ body.dark-mode .modal-content {
   }
 }
 
-/* ================= Seções e Botões de Adicionar ================= */
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.section-header h1 {
-  font-size: 1.5em;
-  font-weight: bold;
-}
-
-.section-header button {
-  padding: 10px 18px;
-  background-color: #40739e;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.section-header button:hover {
-  background-color: #2f3640;
-}
-
-body.dark-mode .section-header button {
-  background-color: #40739e;
-  color: #fff;
-}
-
-body.dark-mode .section-header button:hover {
-  background-color: #2f3640;
-}
-
-/* ================= Agenda ================= */
-#agenda table {
-  margin-bottom: 20px;
-}
-
-.agenda-evento {
-  background: #f9f9f9;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-left: 4px solid #007bff;
-}
-
-.agenda-evento:last-child {
-  margin-bottom: 0;
-}
-
-.agenda-evento button {
-  background: #f44336;
-  color: #fff;
-  border: none;
-  padding: 5px 8px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-#agenda input,
-#agenda button {
-  display: block;
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-#agenda button {
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-}
-
-#agenda button:hover {
-  background-color: #0056b3;
-}

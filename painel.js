@@ -27,110 +27,159 @@ onAuthStateChanged(auth, user => {
 // ------------------ Painel ------------------
 document.addEventListener("DOMContentLoaded", async () => {
 
-  // ----- Seções e modais -----
-  const modalCliente = document.getElementById("modal-cliente");
-  const modalProjeto = document.getElementById("modal-projeto");
-  const tabelaClientes = document.querySelector("#tabela-clientes tbody");
-  const tabelaProjetos = document.querySelector("#tabela-projetos tbody");
-  const selectProjetoCliente = document.getElementById("projeto-cliente");
-
-  const agendaSection = document.getElementById('agenda');
-  let agendaList, adicionarBtn, tituloInput, dataInput, horaInput;
-
- // ----- Agenda -----
-if(agendaSection){
-  agendaList = agendaSection.querySelector('#proximos-eventos');
-  adicionarBtn = agendaSection.querySelector('#adicionar-evento');
-  tituloInput = agendaSection.querySelector('#evento-titulo');
-  dataInput = agendaSection.querySelector('#evento-data');
-  horaInput = agendaSection.querySelector('#evento-hora');
-
-  adicionarBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    const titulo = tituloInput.value.trim();
-    const data = dataInput.value.trim();
-    const hora = horaInput.value.trim();
-
-    if(!titulo || !data || !hora){
-      return alert('Preencha todos os campos');
-    }
-
-    const partes = data.split('-');
-    const dataBR = `${partes[2]}/${partes[1]}/${partes[0]}`;
-
-    const div = document.createElement('div');
-    div.classList.add('agenda-evento');
-    div.innerHTML = `<span>${dataBR} ${hora} - ${titulo}</span> <button class="remover-evento">X</button>`;
-
-    div.querySelector('.remover-evento').addEventListener('click', () => div.remove());
-
-    // Agora vai aparecer
-    agendaList.appendChild(div);
-
-    tituloInput.value = '';
-    dataInput.value = '';
-    horaInput.value = '';
-  });
-}
-
-
-
-  let editarClienteAtual = null;
-  let editarProjetoAtual = null;
-
-  modalCliente.style.display = "none";
-  modalProjeto.style.display = "none";
-
-  // ----- Troca de seções via sidebar -----
-  document.querySelectorAll(".sidebar ul li a").forEach(link => {
-    link.addEventListener("click", (e) => {
-      e.preventDefault();
-      showSection(link.dataset.section);
-    });
-  });
+  // ---------- Seções ----------
+  const sections = document.querySelectorAll("main > section");
+  const sidebarLinks = document.querySelectorAll(".sidebar ul li a");
 
   function showSection(sectionId) {
-    document.querySelectorAll("main > section").forEach(section => section.style.display = "none");
-    document.querySelectorAll(".sidebar ul li a").forEach(link => link.classList.remove("active"));
+    sections.forEach(sec => sec.style.display = "none");
+    sidebarLinks.forEach(link => link.classList.remove("active"));
 
     const section = document.getElementById(sectionId);
     if(section) section.style.display = "block";
 
-    const activeLink = Array.from(document.querySelectorAll(".sidebar ul li a"))
-      .find(link => link.dataset.section === sectionId);
+    const activeLink = Array.from(sidebarLinks).find(link => link.dataset.section === sectionId);
     if(activeLink) activeLink.classList.add("active");
   }
 
   // Inicializa com dashboard aberto
   showSection("dashboard");
 
-  // ----- Dark Mode -----
+  sidebarLinks.forEach(link => {
+    link.addEventListener("click", e => {
+      e.preventDefault();
+      showSection(link.dataset.section);
+    });
+  });
+
+  // ---------- Dark Mode ----------
   const darkSwitch = document.getElementById("dark-mode-switch");
   darkSwitch.addEventListener("change", () => {
     document.body.classList.toggle("dark-mode", darkSwitch.checked);
   });
 
-  // ----- Atualização de totais -----
-  function atualizarTotalClientes() {
-    document.getElementById("total-clientes").textContent = tabelaClientes.children.length;
-    atualizarDropdownClientes();
-  }
+  // ---------- Modais ----------
+  const modalCliente = document.getElementById("modal-cliente");
+  const modalProjeto = document.getElementById("modal-projeto");
+  const modalAgenda = document.getElementById("modal-agenda");
 
-  function atualizarTotalProjetos() {
-    document.getElementById("total-projetos").textContent = tabelaProjetos.children.length;
-  }
+  const abrirFecharModal = (botaoAbrir, modal, botaoFechar) => {
+    if(botaoAbrir) botaoAbrir.addEventListener("click", () => modal.style.display = "flex");
+    if(botaoFechar) botaoFechar.addEventListener("click", () => modal.style.display = "none");
+    window.addEventListener("click", e => {
+      if(e.target === modal) modal.style.display = "none";
+    });
+  };
 
-  function atualizarDropdownClientes() {
-    selectProjetoCliente.innerHTML = `<option value="">Selecione o cliente</option>`;
-    tabelaClientes.querySelectorAll("tr").forEach(tr => {
-      const option = document.createElement("option");
-      option.value = tr.dataset.id;
-      option.textContent = tr.dataset.nome;
-      selectProjetoCliente.appendChild(option);
+  abrirFecharModal(document.getElementById("open-cliente-modal"), modalCliente, document.getElementById("close-cliente-modal"));
+  abrirFecharModal(document.getElementById("open-projeto-modal"), modalProjeto, document.getElementById("close-projeto-modal"));
+  abrirFecharModal(document.getElementById("open-agenda-modal"), modalAgenda, document.getElementById("close-agenda-modal"));
+
+  // ---------- ENTER nos Modais ----------
+  modalCliente.addEventListener("keypress", e => { if(e.key === "Enter"){ e.preventDefault(); document.getElementById("salvar-cliente-btn").click(); } });
+  modalProjeto.addEventListener("keypress", e => { if(e.key === "Enter"){ e.preventDefault(); document.getElementById("salvar-projeto-btn").click(); } });
+  modalAgenda.addEventListener("keypress", e => { if(e.key === "Enter"){ e.preventDefault(); document.getElementById("salvar-evento").click(); } });
+
+  // ---------- Agenda ----------
+  const tituloInput = document.getElementById("evento-titulo");
+  const dataInput = document.getElementById("evento-data");
+  const horaInput = document.getElementById("evento-hora");
+  const listaEventos = document.getElementById("lista-eventos");
+  const buscaEvento = document.getElementById("busca-evento");
+  const salvarEventoBtn = document.getElementById("salvar-evento");
+  let eventos = [];
+
+  function renderizarEventos(filtro = "") {
+    listaEventos.innerHTML = "";
+    const filtrados = eventos
+      .filter(ev => ev.titulo.toLowerCase().includes(filtro.toLowerCase()))
+      .sort((a,b) => new Date(a.data.split("/").reverse().join("-") + " " + a.hora) - new Date(b.data.split("/").reverse().join("-") + " " + b.hora));
+
+    if(filtrados.length === 0){
+      listaEventos.innerHTML = `<p style="color:#999;">Nenhum evento encontrado.</p>`;
+      return;
+    }
+
+    filtrados.forEach(ev => {
+      const card = document.createElement("div");
+      card.classList.add("evento-card");
+      card.innerHTML = `
+        <div class="evento-info">
+          <h4>${ev.titulo}</h4>
+          <p>📅 ${ev.data} ⏰ ${ev.hora}</p>
+        </div>
+        <button class="btn-excluir-evento">Excluir</button>
+      `;
+      card.querySelector(".btn-excluir-evento").addEventListener("click", async () => {
+        modalConfirmacao("Deseja realmente excluir este evento?", async () => {
+          await deleteDoc(doc(db, "eventos", ev.id));
+          eventos = eventos.filter(x => x.id !== ev.id);
+          renderizarEventos();
+        });
+      });
+      listaEventos.appendChild(card);
     });
   }
 
-  // ----- Carregar Clientes -----
+  // Pesquisa com Enter
+  buscaEvento.addEventListener("input", e => renderizarEventos(e.target.value));
+  buscaEvento.addEventListener("keypress", e => { if(e.key === "Enter"){ e.preventDefault(); renderizarEventos(buscaEvento.value); } });
+
+  async function carregarEventos() {
+    const snapshot = await getDocs(collection(db, "eventos"));
+    eventos = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+    renderizarEventos();
+  }
+  await carregarEventos();
+
+  salvarEventoBtn.addEventListener("click", async () => {
+    const titulo = tituloInput.value.trim();
+    const data = dataInput.value;
+    const hora = horaInput.value;
+
+    if(!titulo || !data || !hora){
+      modalAlerta("Preencha todos os campos!");
+      return;
+    }
+
+    const partes = data.split("-");
+    const dataBR = `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+    const novoEvento = { titulo, data: dataBR, hora };
+    const ref = await addDoc(collection(db, "eventos"), novoEvento);
+    novoEvento.id = ref.id;
+    eventos.push(novoEvento);
+    renderizarEventos();
+
+    tituloInput.value = "";
+    dataInput.value = "";
+    horaInput.value = "";
+    modalAgenda.style.display = "none";
+  });
+
+  // ---------- Compromissos de Hoje (Dashboard) ----------
+  async function carregarCompromissosHoje() {
+    const listaHoje = document.getElementById("lista-hoje");
+    if(!listaHoje) return;
+
+    const snapshot = await getDocs(collection(db, "eventos"));
+    const todosEventos = snapshot.docs.map(docSnap => docSnap.data());
+
+    const hoje = new Date();
+    const dia = String(hoje.getDate()).padStart(2, "0");
+    const mes = String(hoje.getMonth()+1).padStart(2, "0");
+    const ano = hoje.getFullYear();
+    const dataHoje = `${dia}/${mes}/${ano}`;
+
+    const eventosHoje = todosEventos.filter(ev => ev.data === dataHoje).sort((a,b) => a.hora.localeCompare(b.hora));
+    listaHoje.innerHTML = eventosHoje.length ? eventosHoje.map(ev => `<li><strong>${ev.titulo}</strong> <span>${ev.hora}</span></li>`).join("") : `<li>Nenhum compromisso para hoje 🎉</li>`;
+  }
+  await carregarCompromissosHoje();
+
+  // ---------- Clientes ----------
+  const tabelaClientes = document.querySelector("#tabela-clientes tbody");
+  let editarClienteAtual = null;
+
   async function carregarClientes() {
     tabelaClientes.innerHTML = "";
     const snapshot = await getDocs(collection(db, "clientes"));
@@ -151,10 +200,10 @@ if(agendaSection){
       tr.dataset.servico = data.servico;
 
       tr.innerHTML = `
-        <td class="nome">${data.nome}</td>
-        <td class="email">${data.email}</td>
-        <td class="telefone">${data.telefone}</td>
-        <td class="servico">${data.servico}</td>
+        <td>${data.nome}</td>
+        <td>${data.email}</td>
+        <td>${data.telefone}</td>
+        <td>${data.servico}</td>
         <td>
           <button class="btn-editar">Editar</button>
           <button class="btn-excluir">Excluir</button>
@@ -171,11 +220,11 @@ if(agendaSection){
       });
 
       tr.querySelector(".btn-excluir").addEventListener("click", async () => {
-        if(confirm(`Deseja realmente excluir ${data.nome}?`)){
+        modalConfirmacao(`Deseja realmente excluir ${data.nome}?`, async () => {
           await deleteDoc(doc(db, "clientes", docSnap.id));
           tr.remove();
           atualizarTotalClientes();
-        }
+        });
       });
 
       tabelaClientes.appendChild(tr);
@@ -184,7 +233,28 @@ if(agendaSection){
     atualizarTotalClientes();
   }
 
-  // ----- Carregar Projetos -----
+  function atualizarTotalClientes() {
+    document.getElementById("total-clientes").textContent = tabelaClientes.children.length;
+    atualizarDropdownClientes();
+  }
+
+  function atualizarDropdownClientes() {
+    const selectProjetoCliente = document.getElementById("projeto-cliente");
+    selectProjetoCliente.innerHTML = `<option value="">Selecione o cliente</option>`;
+    tabelaClientes.querySelectorAll("tr").forEach(tr => {
+      const option = document.createElement("option");
+      option.value = tr.dataset.id;
+      option.textContent = tr.dataset.nome;
+      selectProjetoCliente.appendChild(option);
+    });
+  }
+
+  await carregarClientes();
+
+  // ---------- Projetos ----------
+  const tabelaProjetos = document.querySelector("#tabela-projetos tbody");
+  let editarProjetoAtual = null;
+
   async function carregarProjetos() {
     tabelaProjetos.innerHTML = "";
     const snapshot = await getDocs(collection(db, "projetos"));
@@ -203,8 +273,8 @@ if(agendaSection){
       tr.dataset.cliente = data.cliente;
 
       tr.innerHTML = `
-        <td class="nome">${data.nome}</td>
-        <td class="cliente">${data.clienteNome}</td>
+        <td>${data.nome}</td>
+        <td>${data.clienteNome}</td>
         <td>
           <button class="btn-editar">Editar</button>
           <button class="btn-excluir">Excluir</button>
@@ -213,17 +283,17 @@ if(agendaSection){
 
       tr.querySelector(".btn-editar").addEventListener("click", () => {
         document.getElementById("projeto-nome").value = data.nome;
-        selectProjetoCliente.value = data.cliente;
+        document.getElementById("projeto-cliente").value = data.cliente;
         editarProjetoAtual = tr;
         modalProjeto.style.display = "flex";
       });
 
       tr.querySelector(".btn-excluir").addEventListener("click", async () => {
-        if(confirm(`Deseja realmente excluir ${data.nome}?`)){
+        modalConfirmacao(`Deseja realmente excluir ${data.nome}?`, async () => {
           await deleteDoc(doc(db, "projetos", docSnap.id));
           tr.remove();
           atualizarTotalProjetos();
-        }
+        });
       });
 
       tabelaProjetos.appendChild(tr);
@@ -232,50 +302,30 @@ if(agendaSection){
     atualizarTotalProjetos();
   }
 
-  await carregarClientes();
+  function atualizarTotalProjetos() {
+    document.getElementById("total-projetos").textContent = tabelaProjetos.children.length;
+  }
+
   await carregarProjetos();
 
-  // ----- Abrir/Fechar Modais -----
-  document.getElementById("open-cliente-modal").addEventListener("click", () => modalCliente.style.display = "flex");
-  document.getElementById("close-cliente-modal").addEventListener("click", () => modalCliente.style.display = "none");
-  document.getElementById("open-projeto-modal").addEventListener("click", () => modalProjeto.style.display = "flex");
-  document.getElementById("close-projeto-modal").addEventListener("click", () => modalProjeto.style.display = "none");
-
-  window.addEventListener("click", e => {
-    if(e.target === modalCliente) modalCliente.style.display = "none";
-    if(e.target === modalProjeto) modalProjeto.style.display = "none";
-  });
-
-  // ----- Função auxiliar para mostrar loading -----
-  function mostrarLoading(botao, texto = "Salvando") {
-    botao.disabled = true;
-    botao.innerHTML = `${texto} <span class="spinner"></span>`;
-  }
-
-  function resetarBotao(botao, textoOriginal) {
-    botao.disabled = false;
-    botao.textContent = textoOriginal;
-  }
-
-  // ----- Salvar Cliente -----
+  // ---------- Salvar Cliente ----------
   document.getElementById("salvar-cliente-btn").addEventListener("click", async (e) => {
     const botao = e.target;
-    mostrarLoading(botao);
+    botao.disabled = true;
 
     const nome = document.getElementById("cliente-nome").value.trim();
     const email = document.getElementById("cliente-email").value.trim();
     const telefone = document.getElementById("cliente-telefone").value.trim();
     const servico = document.getElementById("cliente-servico").value.trim();
 
-    if(!nome || !email) {
-      alert("Preencha nome e email");
-      resetarBotao(botao, "Salvar Cliente");
+    if(!nome || !email){
+      modalAlerta("Preencha nome e email");
+      botao.disabled = false;
       return;
     }
 
     if(editarClienteAtual){
-      const id = editarClienteAtual.dataset.id;
-      await updateDoc(doc(db, "clientes", id), { nome, email, telefone, servico });
+      await updateDoc(doc(db, "clientes", editarClienteAtual.dataset.id), { nome, email, telefone, servico });
       editarClienteAtual = null;
     } else {
       await addDoc(collection(db, "clientes"), { nome, email, telefone, servico });
@@ -289,33 +339,26 @@ if(agendaSection){
     document.getElementById("cliente-servico").value = "";
 
     modalCliente.style.display = "none";
-    resetarBotao(botao, "Salvar Cliente");
+    botao.disabled = false;
   });
 
-  // ----- Salvar Projeto -----
+  // ---------- Salvar Projeto ----------
   document.getElementById("salvar-projeto-btn").addEventListener("click", async (e) => {
     const botao = e.target;
-    mostrarLoading(botao);
+    botao.disabled = true;
 
     const nome = document.getElementById("projeto-nome").value.trim();
-    const clienteId = selectProjetoCliente.value;
+    const clienteId = document.getElementById("projeto-cliente").value;
+    const clienteNome = document.getElementById("projeto-cliente").options[document.getElementById("projeto-cliente").selectedIndex].text;
 
-    if (!nome) {
-      alert("Digite o nome do projeto");
-      resetarBotao(botao, "Salvar Projeto");
-      return;
-    }
-    if (!clienteId) {
-      alert("Selecione um cliente válido");
-      resetarBotao(botao, "Salvar Projeto");
+    if(!nome || !clienteId){
+      modalAlerta("Preencha nome do projeto e selecione cliente");
+      botao.disabled = false;
       return;
     }
 
-    const clienteNome = selectProjetoCliente.options[selectProjetoCliente.selectedIndex].text;
-
-    if (editarProjetoAtual) {
-      const id = editarProjetoAtual.dataset.id;
-      await updateDoc(doc(db, "projetos", id), { nome, cliente: clienteId, clienteNome });
+    if(editarProjetoAtual){
+      await updateDoc(doc(db, "projetos", editarProjetoAtual.dataset.id), { nome, cliente: clienteId, clienteNome });
       editarProjetoAtual = null;
     } else {
       await addDoc(collection(db, "projetos"), { nome, cliente: clienteId, clienteNome });
@@ -324,56 +367,60 @@ if(agendaSection){
     await carregarProjetos();
 
     document.getElementById("projeto-nome").value = "";
-    selectProjetoCliente.value = "";
+    document.getElementById("projeto-cliente").value = "";
 
     modalProjeto.style.display = "none";
-    resetarBotao(botao, "Salvar Projeto");
+    botao.disabled = false;
   });
 
-  // ----- Logout -----
+  // ---------- Logout ----------
   const logoutBtn = document.getElementById("logout-btn");
   if(logoutBtn){
     logoutBtn.addEventListener("click", () => {
       signOut(auth)
         .then(() => window.location.href = "index.html")
-        .catch(err => alert("Erro ao sair: " + err.message));
+        .catch(err => modalAlerta("Erro ao sair: " + err.message));
     });
   }
 
- 
+  // ---------- Modal de Confirmação ----------
+  function modalConfirmacao(mensagem, callback){
+    const modal = document.createElement("div");
+    modal.classList.add("modal");
+    modal.style.display = "flex";
+    modal.innerHTML = `
+      <div class="modal-content">
+        <p>${mensagem}</p>
+        <div style="display:flex;justify-content:space-between;margin-top:20px;">
+          <button id="confirmar">Sim</button>
+          <button id="cancelar">Não</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
 
-
-});
-
-
-adicionarBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-
-  const titulo = tituloInput.value.trim();
-  const data = dataInput.value.trim();
-  const hora = horaInput.value.trim();
-
-  if (!titulo || !data || !hora) {
-    alert('Preencha todos os campos');
-    return;
+    modal.querySelector("#confirmar").addEventListener("click", () => {
+      callback();
+      modal.remove();
+    });
+    modal.querySelector("#cancelar").addEventListener("click", () => modal.remove());
+    window.addEventListener("click", e => { if(e.target === modal) modal.remove(); });
   }
 
-  const partes = data.split('-');
-  const dataBR = `${partes[2]}/${partes[1]}/${partes[0]}`;
+  // ---------- Modal de Alerta ----------
+  function modalAlerta(mensagem){
+    const modal = document.createElement("div");
+    modal.classList.add("modal");
+    modal.style.display = "flex";
+    modal.innerHTML = `
+      <div class="modal-content">
+        <p>${mensagem}</p>
+        <button id="fechar">Fechar</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.querySelector("#fechar").addEventListener("click", () => modal.remove());
+    window.addEventListener("click", e => { if(e.target === modal) modal.remove(); });
+  }
 
-  const tr = document.createElement('tr');
-
-  tr.innerHTML = `
-    <td>${dataBR} ${hora}</td>
-    <td>${titulo}</td>
-    <td><button class="remover-evento">X</button></td>
-  `;
-
-  tr.querySelector('.remover-evento').addEventListener('click', () => tr.remove());
-
-  agendaList.appendChild(tr);
-
-  tituloInput.value = '';
-  dataInput.value = '';
-  horaInput.value = '';
 });
