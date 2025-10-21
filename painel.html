@@ -30,6 +30,8 @@
       <!-- Dashboard -->
       <section id="dashboard" class="active">
         <h1>Dashboard</h1>
+
+        <!-- Cards de Totais -->
         <div class="cards">
           <div class="card">
             <h3>Total Clientes</h3>
@@ -40,49 +42,38 @@
             <p id="total-projetos">0</p>
           </div>
         </div>
-        <!-- Compromissos de Hoje -->
-<div class="card compromissos-hoje">
-  <h3>Compromissos de Hoje</h3>
-  <ul id="lista-hoje">
-    <li>Carregando compromissos...</li>
-  </ul>
-</div>
 
+        <!-- Compromissos de Hoje -->
+        <div class="card compromissos-hoje">
+          <h3>Compromissos de Hoje</h3>
+          <ul id="lista-hoje">
+            <li>Carregando compromissos...</li>
+          </ul>
+        </div>
+
+        <!-- Projetos em Cards -->
+        <div class="section-header" style="margin-top:20px;">
+          <h3>Projetos</h3>
+        </div>
+        <div id="lista-projetos-dashboard" class="cards">
+          <!-- Cards de projetos serão gerados pelo JS -->
+        </div>
       </section>
 
       <!-- Agenda -->
-   <!-- AGENDA MODERNA -->
-<section id="agenda" style="display:none;">
-  <div class="section-header">
-    <h1>Agenda</h1>
-    <button id="open-agenda-modal">+ Novo Evento</button>
-  </div>
-
-  <div class="agenda-container">
-    <input type="text" id="busca-evento" placeholder="🔍 Buscar evento..." />
-    <div id="lista-eventos" class="agenda-lista">
-      <!-- Eventos serão carregados aqui -->
-    </div>
-  </div>
-</section>
-
-<!-- MODAL DE EVENTO -->
-<div id="modal-agenda" class="modal">
-  <div class="modal-content">
-    <span class="close" id="close-agenda-modal">&times;</span>
-    <h2>Novo Evento</h2>
-    <input type="text" id="evento-titulo" placeholder="Título do evento">
-    <input type="date" id="evento-data">
-    <input type="time" id="evento-hora">
-    <button id="salvar-evento">Salvar Evento</button>
-  </div>
-</div>
-
-
-
+      <section id="agenda" style="display:none;">
+        <div class="section-header">
+          <h1>Agenda</h1>
+          <button id="open-agenda-modal">+ Novo Evento</button>
+        </div>
+        <div class="agenda-container">
+          <input type="text" id="busca-evento" placeholder="🔍 Buscar evento..." />
+          <div id="lista-eventos" class="agenda-lista"></div>
+        </div>
+      </section>
 
       <!-- Clientes -->
-      <section id="clientes">
+      <section id="clientes" style="display:none;">
         <div class="section-header">
           <h1>Clientes</h1>
           <button id="open-cliente-modal">Adicionar Cliente</button>
@@ -102,7 +93,7 @@
       </section>
 
       <!-- Projetos -->
-      <section id="projetos">
+      <section id="projetos" style="display:none;">
         <div class="section-header">
           <h1>Projetos</h1>
           <button id="open-projeto-modal">Adicionar Projeto</button>
@@ -143,25 +134,49 @@
       <select id="projeto-cliente">
         <option value="">Selecione o cliente</option>
       </select>
+      <input type="file" id="projeto-imagem" accept="image/*">
       <button id="salvar-projeto-btn">Salvar Projeto</button>
     </div>
   </div>
 
-  <!-- IMPORTANDO O JS COMO MODULE PARA FUNCIONAR COM FIREBASE -->
-  <script type="module" src="painel.js"></script>
-
-  <!-- Modal de Confirmação -->
-<div id="modal-confirm" class="modal">
-  <div class="modal-content">
-    <span class="close" id="close-confirm">&times;</span>
-    <h2>Confirmação</h2>
-    <p id="confirm-text">Deseja realmente excluir este item?</p>
-    <div style="display:flex; justify-content: space-between; gap:10px; margin-top:20px;">
-      <button id="confirm-yes" class="primary">Sim</button>
-      <button id="confirm-no" class="btn-excluir">Não</button>
+  <!-- Modal Detalhes Projeto -->
+  <div id="modal-detalhes-projeto" class="modal">
+    <div class="modal-content">
+      <span class="close" id="close-detalhes-projeto">&times;</span>
+      <h2 id="detalhes-projeto-nome">Projeto Nome</h2>
+      <p><strong>Cliente:</strong> <span id="detalhes-projeto-cliente"></span></p>
+      <p><strong>Descrição:</strong> <span id="detalhes-projeto-descricao">Sem descrição.</span></p>
+      <p><strong>Status:</strong> <span id="detalhes-projeto-status">Em andamento</span></p>
+      <img id="detalhes-projeto-imagem" src="" alt="Imagem do Projeto" style="max-width:100%; margin-top:10px;">
     </div>
   </div>
-</div>
 
+  <!-- Modal Agenda -->
+  <div id="modal-agenda" class="modal">
+    <div class="modal-content">
+      <span class="close" id="close-agenda-modal">&times;</span>
+      <h2>Novo Evento</h2>
+      <input type="text" id="evento-titulo" placeholder="Título do evento">
+      <input type="date" id="evento-data">
+      <input type="time" id="evento-hora">
+      <button id="salvar-evento">Salvar Evento</button>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação -->
+  <div id="modal-confirm" class="modal">
+    <div class="modal-content">
+      <span class="close" id="close-confirm">&times;</span>
+      <h2>Confirmação</h2>
+      <p id="confirm-text">Deseja realmente excluir este item?</p>
+      <div style="display:flex; justify-content: space-between; gap:10px; margin-top:20px;">
+        <button id="confirm-yes" class="primary">Sim</button>
+        <button id="confirm-no" class="btn-excluir">Não</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script type="module" src="painel.js"></script>
 </body>
 </html>

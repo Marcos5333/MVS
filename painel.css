@@ -499,3 +499,92 @@ body.dark-mode #busca-evento {
     margin-top: 5px;
   }
 }
+
+/* ------------------ Cards de Projetos no Dashboard ------------------ */
+#lista-projetos-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  margin-top: 15px;
+}
+
+/* Card individual */
+#lista-projetos-dashboard .card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+
+#lista-projetos-dashboard .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+/* Imagem do projeto */
+#lista-projetos-dashboard .card img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+
+/* Conteúdo do card */
+#lista-projetos-dashboard .card .card-body {
+  padding: 12px 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#lista-projetos-dashboard .card h4 {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  color: #222;
+  font-weight: 600;
+}
+
+#lista-projetos-dashboard .card p {
+  margin: 3px 0;
+  font-size: 13px;
+  color: #555;
+}
+
+/* Badge de status */
+#lista-projetos-dashboard .card .status {
+  align-self: flex-start;
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #fff;
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+
+#lista-projetos-dashboard .card .status.ativo {
+  background-color: #28a745; /* verde */
+}
+
+#lista-projetos-dashboard .card .status.concluido {
+  background-color: #007bff; /* azul */
+}
+
+#lista-projetos-dashboard .card .status.atrasado {
+  background-color: #dc3545; /* vermelho */
+}
+
+/* Modal de detalhes do projeto */
+#modal-detalhes-projeto .modal-content {
+  max-width: 450px;
+  padding: 25px;
+}
+
+#modal-detalhes-projeto h2 {
+  margin-top: 0;
+  color: #222;
+}
